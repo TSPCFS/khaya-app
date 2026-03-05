@@ -162,12 +162,12 @@ const Card=({p,tap,grid,dist})=>{
     const specsErf=[...specs,p.erf_size>0&&p.erf_size+'m² erf'].filter(Boolean);
     if(grid)return(
         <div onClick={()=>tap(p)} className="bg-dn-light rounded-xl overflow-hidden cursor-pointer ch fi">
-            <div className="relative"><img src={img} alt={p.title} className="w-full h-28 object-cover" loading="lazy" onError={imgErr}/>{p.featured&&<span className="absolute top-2 left-2 bg-flame text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Featured</span>}{dist&&<span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-1 rounded-lg">{dist} km</span>}</div>
+            <div className="relative"><img src={img} alt={p.title} className="w-full h-28 object-cover" loading="lazy" onError={imgErr}/>{!!p.featured&&<span className="absolute top-2 left-2 bg-flame text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Featured</span>}{dist&&<span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-1 rounded-lg">{dist} km</span>}</div>
             <div className="p-3"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm mt-0.5">{p.suburb}, {p.city}</p>{specs.length>0&&<div className="flex gap-2 mt-1.5 text-[10px] text-storm">{specs.map((s,i)=><React.Fragment key={i}>{i>0&&<span>·</span>}<span>{s}</span></React.Fragment>)}</div>}</div>
         </div>);
     return(
         <div onClick={()=>tap(p)} className="flex gap-3 p-3 bg-dn-light rounded-xl cursor-pointer ch fi mb-2">
-            <div className="relative flex-shrink-0"><img src={img} alt={p.title} className="w-20 h-20 rounded-lg object-cover" loading="lazy" onError={imgErr}/>{p.featured&&<span className="absolute top-1 left-1 bg-flame w-2 h-2 rounded-full"></span>}</div>
+            <div className="relative flex-shrink-0"><img src={img} alt={p.title} className="w-20 h-20 rounded-lg object-cover" loading="lazy" onError={imgErr}/>{!!p.featured&&<span className="absolute top-1 left-1 bg-flame w-2 h-2 rounded-full"></span>}</div>
             <div className="flex-1 min-w-0"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm">{p.suburb}, {p.city}</p>{specsErf.length>0&&<div className="flex gap-2 mt-1 text-[10px] text-storm">{specsErf.map((s,i)=><React.Fragment key={i}>{i>0&&<span>·</span>}<span>{s}</span></React.Fragment>)}</div>}</div>
         </div>);
 };
