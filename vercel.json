@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ],
+  "env": {
+    "JWT_SECRET": "@jwt-secret",
+    "NODE_ENV": "production"
+  },
+  "note": "SQLite (better-sqlite3) does not work on Vercel's serverless platform. For production deployment, consider using Railway, Render, or another platform that supports persistent filesystems. Alternatively, migrate to PostgreSQL for serverless compatibility."
+}

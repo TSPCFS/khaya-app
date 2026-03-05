@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.env
+db/khaya.db
+db/khaya.db-shm
+db/khaya.db-wal
+*.log
+.claude/
+*.swp
+*.swo
+.vscode/
+.idea/
