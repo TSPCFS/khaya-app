@@ -154,17 +154,21 @@ const Onboarding=({done})=>{
 };
 
 // ═══════════════════ PROPERTY CARD ═══════════════════
+const FALLBACK_IMG='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" fill="%232A2A3E"><rect width="400" height="300"/><text x="200" y="150" text-anchor="middle" fill="%236B7280" font-size="14" font-family="sans-serif">No image available</text></svg>');
+const imgErr=(e)=>{e.target.onerror=null;e.target.src=FALLBACK_IMG};
 const Card=({p,tap,grid,dist})=>{
-    const img=parseJSON(p.images)[0]||'https://via.placeholder.com/400x300?text=Property';
+    const img=parseJSON(p.images)[0]||FALLBACK_IMG;
+    const specs=[p.bedrooms&&p.bedrooms+' bed',p.bathrooms&&p.bathrooms+' bath',p.floor_size&&p.floor_size+'m²'].filter(Boolean);
+    const specsErf=[...specs,p.erf_size>0&&p.erf_size+'m² erf'].filter(Boolean);
     if(grid)return(
         <div onClick={()=>tap(p)} className="bg-dn-light rounded-xl overflow-hidden cursor-pointer ch fi">
-            <div className="relative"><img src={img} alt={p.title} className="w-full h-28 object-cover" loading="lazy"/>{p.featured&&<span className="absolute top-2 left-2 bg-flame text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Featured</span>}{dist&&<span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-1 rounded-lg">{dist} km</span>}</div>
-            <div className="p-3"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm mt-0.5">{p.suburb}, {p.city}</p><div className="flex gap-2 mt-1.5 text-[10px] text-storm"><span>{p.bedrooms} bed</span><span>·</span><span>{p.bathrooms} bath</span><span>·</span><span>{p.floor_size}m²</span></div></div>
+            <div className="relative"><img src={img} alt={p.title} className="w-full h-28 object-cover" loading="lazy" onError={imgErr}/>{p.featured&&<span className="absolute top-2 left-2 bg-flame text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Featured</span>}{dist&&<span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-1 rounded-lg">{dist} km</span>}</div>
+            <div className="p-3"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm mt-0.5">{p.suburb}, {p.city}</p>{specs.length>0&&<div className="flex gap-2 mt-1.5 text-[10px] text-storm">{specs.map((s,i)=><React.Fragment key={i}>{i>0&&<span>·</span>}<span>{s}</span></React.Fragment>)}</div>}</div>
         </div>);
     return(
         <div onClick={()=>tap(p)} className="flex gap-3 p-3 bg-dn-light rounded-xl cursor-pointer ch fi mb-2">
-            <div className="relative flex-shrink-0"><img src={img} alt={p.title} className="w-20 h-20 rounded-lg object-cover" loading="lazy"/>{p.featured&&<span className="absolute top-1 left-1 bg-flame w-2 h-2 rounded-full"></span>}</div>
-            <div className="flex-1 min-w-0"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm">{p.suburb}, {p.city}</p><div className="flex gap-2 mt-1 text-[10px] text-storm"><span>{p.bedrooms} bed</span><span>·</span><span>{p.bathrooms} bath</span><span>·</span><span>{p.floor_size}m²</span>{p.erf_size>0&&<><span>·</span><span>{p.erf_size}m² erf</span></>}</div></div>
+            <div className="relative flex-shrink-0"><img src={img} alt={p.title} className="w-20 h-20 rounded-lg object-cover" loading="lazy" onError={imgErr}/>{p.featured&&<span className="absolute top-1 left-1 bg-flame w-2 h-2 rounded-full"></span>}</div>
+            <div className="flex-1 min-w-0"><p className="text-flame font-bold text-sm font-grotesk">{fp(p.price)}</p><p className="text-xs font-medium mt-0.5 truncate">{p.title}</p><p className="text-[10px] text-storm">{p.suburb}, {p.city}</p>{specsErf.length>0&&<div className="flex gap-2 mt-1 text-[10px] text-storm">{specsErf.map((s,i)=><React.Fragment key={i}>{i>0&&<span>·</span>}<span>{s}</span></React.Fragment>)}</div>}</div>
         </div>);
 };
 
@@ -232,9 +236,9 @@ const Detail=({p,close,properties})=>{
     const toggleSave=async()=>{try{if(sv){await api.del('/users/saved/'+p.id)}else{await api.post('/users/saved/'+p.id,{})}setSv(!sv)}catch{}};
     return(
         <div className="fixed inset-0 z-[2000] bg-deep-night overflow-y-auto su">
-            {fg&&<div className="fixed inset-0 z-[2001] bg-black flex items-center justify-center" onClick={()=>setFg(false)}><img src={imgs[ii]} alt="" className="max-h-screen max-w-full object-contain"/></div>}
+            {fg&&<div className="fixed inset-0 z-[2001] bg-black flex items-center justify-center" onClick={()=>setFg(false)}><img src={imgs[ii]||FALLBACK_IMG} alt="" className="max-h-screen max-w-full object-contain" onError={imgErr}/></div>}
             <div className="relative h-72">
-                <img src={imgs[ii]||'https://via.placeholder.com/800x300?text=Property'} alt={p.title} className="w-full h-full object-cover cursor-pointer" onClick={()=>setFg(true)}/>
+                <img src={imgs[ii]||FALLBACK_IMG} alt={p.title} className="w-full h-full object-cover cursor-pointer" onClick={()=>setFg(true)} onError={imgErr}/>
                 <div className="absolute inset-0" style={{background:'linear-gradient(transparent 40%, #1A1A2E)'}}></div>
                 <div className="absolute top-4 right-4 bg-black/50 backdrop-blur px-2.5 py-1 rounded-lg text-white text-xs font-medium">{ii+1}/{imgs.length}</div>
                 <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-4">
@@ -393,13 +397,17 @@ const ChatsTab=({chats})=>{
                 <div className="flex gap-2"><input type="text" placeholder="Type a message..." className="flex-1 bg-deep-night rounded-xl px-3 py-2.5 text-sm outline-none border border-charcoal focus:border-flame transition"/><button className="w-10 h-10 rounded-full bg-flame flex items-center justify-center text-white">➤</button></div>
             </div>
         </div>);
-    const unreadCount=chats.reduce((a,c)=>a+(c.unread_count||0),0);
     return(
         <div className="h-full overflow-y-auto bg-deep-night p-4 pb-24">
             <h1 className="font-grotesk text-2xl font-bold mb-1">Messages</h1><p className="text-xs text-storm mb-4">Your WhatsApp conversations with agents</p>
+            {chats.length===0&&<div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-20 h-20 rounded-full bg-dn-light flex items-center justify-center text-4xl mb-4">💬</div>
+                <h2 className="font-grotesk text-lg font-bold mb-2">No conversations yet</h2>
+                <p className="text-sm text-storm max-w-xs leading-relaxed">When you contact an agent about a property, your conversations will appear here.</p>
+            </div>}
             {chats.map(c=>(
                 <div key={c.id} onClick={()=>setOp(c)} className="flex gap-3 p-3 mb-2 bg-dn-light rounded-xl cursor-pointer ch">
-                    <div className="relative flex-shrink-0"><div className="w-12 h-12 rounded-full bg-charcoal flex items-center justify-center text-lg">👤</div>{c.unread_count>0&&<span className="absolute -top-1 -right-1 w-5 h-5 bg-flame rounded-full flex items-center justify-center text-white text-[10px] font-bold">{c.unread_count}</span>}</div>
+                    <div className="relative flex-shrink-0"><div className="w-12 h-12 rounded-full bg-charcoal flex items-center justify-center text-lg">👤</div>{c.unread>0&&<span className="absolute -top-1 -right-1 w-5 h-5 bg-flame rounded-full flex items-center justify-center text-white text-[10px] font-bold">{c.unread}</span>}</div>
                     <div className="flex-1 min-w-0"><div className="flex justify-between"><h3 className="font-semibold text-sm">{c.agent_name}</h3><span className="text-[10px] text-storm">{new Date(c.last_message_time).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}</span></div><p className="text-xs text-storm truncate mt-0.5">{c.property_title}</p><p className="text-xs text-storm truncate mt-0.5">{c.last_message}</p></div>
                 </div>))}
         </div>);
@@ -407,8 +415,8 @@ const ChatsTab=({chats})=>{
 
 // ═══════════════════ PROFILE TAB ═══════════════════
 const ProfileTab=({user,onLogout})=>{
-    const[dm,setDm]=useState(true);const[pp,setPp]=useState(3000000);const[dp,setDp]=useState(10);const[stats,setStats]=useState({propertiesViewed:0,agentsContacted:0,propertiesSaved:0});
-    useEffect(()=>{api.get('/users/stats').then(s=>setStats(s)).catch(()=>{})},[]);
+    const[dm,setDm]=useState(true);const[pp,setPp]=useState(3000000);const[dp,setDp]=useState(10);const[stats,setStats]=useState({propertiesViewed:0,agentsContacted:0,propertiesSaved:0});const[saved,setSaved]=useState([]);const[showSaved,setShowSaved]=useState(false);
+    useEffect(()=>{api.get('/users/stats').then(s=>setStats(s)).catch(()=>{});api.get('/users/saved').then(r=>setSaved(r.data||[])).catch(()=>{})},[]);
     const mp=calcMonthlyPayment(pp,dp,11.75,240);const ti=mp*240-pp;const tc=pp+ti;
     const calcTd=(p)=>{if(p<=1.1e6)return 0;if(p<=1.512e6)return(p-1.1e6)*0.03;if(p<=2.117e6)return 0.03*0.412e6+(p-1.512e6)*0.06;if(p<=2.722e6)return 0.03*0.412e6+0.06*0.605e6+(p-2.117e6)*0.08;if(p<=12.1e6)return 0.03*0.412e6+0.06*0.605e6+0.08*0.605e6+(p-2.722e6)*0.11;return 0.03*0.412e6+0.06*0.605e6+0.08*0.605e6+0.11*9.378e6+(p-12.1e6)*0.13};
     const td=calcTd(pp);const af=pp*0.015;const tc2=td+af;
@@ -416,10 +424,15 @@ const ProfileTab=({user,onLogout})=>{
         <div className="h-full overflow-y-auto bg-deep-night p-4 pb-24">
             <div className="flex items-center gap-4 mb-6"><div className="w-16 h-16 rounded-full bg-flame/20 flex items-center justify-center text-2xl border-2 border-flame">👤</div><div><h1 className="font-grotesk text-2xl font-bold">{user?.name||'User'}</h1><p className="text-sm text-storm">{user?.email}</p></div></div>
             <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="bg-dn-light rounded-xl p-3 text-center"><p className="text-xs text-storm">Viewed</p><p className="text-lg font-bold text-flame mt-1">{stats.propertiesViewed}</p></div>
-                <div className="bg-dn-light rounded-xl p-3 text-center"><p className="text-xs text-storm">Contacted</p><p className="text-lg font-bold text-teal mt-1">{stats.agentsContacted}</p></div>
-                <div className="bg-dn-light rounded-xl p-3 text-center"><p className="text-xs text-storm">Saved</p><p className="text-lg font-bold text-green mt-1">{stats.propertiesSaved}</p></div>
+                <div className="bg-dn-light rounded-xl p-3 text-center"><p className="text-xs text-storm">Viewed</p><p className="text-lg font-bold text-flame mt-1">{stats.propertiesViewed||'—'}</p></div>
+                <div className="bg-dn-light rounded-xl p-3 text-center"><p className="text-xs text-storm">Contacted</p><p className="text-lg font-bold text-teal mt-1">{stats.agentsContacted||'—'}</p></div>
+                <div onClick={()=>setShowSaved(!showSaved)} className="bg-dn-light rounded-xl p-3 text-center cursor-pointer hover:bg-charcoal/50 transition"><p className="text-xs text-storm">Saved</p><p className="text-lg font-bold text-green mt-1">{saved.length||'—'}</p></div>
             </div>
+            {showSaved&&<div className="mb-6">
+                <h3 className="font-semibold text-sm mb-3">Saved Properties</h3>
+                {saved.length===0&&<div className="bg-dn-light rounded-xl p-6 text-center"><p className="text-sm text-storm">No saved properties yet. Tap ❤️ on any listing to save it.</p></div>}
+                {saved.map(p=><div key={p.id} className="flex gap-3 p-3 bg-dn-light rounded-xl mb-2"><div className="flex-shrink-0"><img src={parseJSON(p.images)[0]||FALLBACK_IMG} alt={p.title} className="w-16 h-16 rounded-lg object-cover" onError={imgErr}/></div><div className="flex-1 min-w-0"><p className="text-flame font-bold text-sm">{fp(p.price)}</p><p className="text-xs font-medium truncate">{p.title}</p><p className="text-[10px] text-storm">{p.suburb}, {p.city}</p></div></div>)}
+            </div>}
             <h3 className="font-semibold text-sm mb-3">Mortgage Calculator</h3>
             <div className="bg-dn-light rounded-xl p-4 mb-6">
                 <div className="mb-4"><p className="text-xs text-storm mb-2">Property Price</p><input type="range" min="500000" max="20000000" step="100000" value={pp} onChange={e=>setPp(Number(e.target.value))} className="w-full"/><p className="text-sm font-bold text-flame mt-2">{fp(pp)}</p></div>
@@ -444,11 +457,13 @@ const App=()=>{
     return(
         <div className="h-screen bg-deep-night flex flex-col">
             <Toast/>
+            <div className="flex-1 overflow-hidden tab-fade" key={tab}>
             {tab==='search'&&<SearchTab properties={properties} onSelect={p=>setSel(p)}/>}
             {tab==='explore'&&<ExploreTab properties={properties} onSelect={p=>setSel(p)}/>}
             {tab==='snap'&&<SnapTab properties={properties} onSelect={p=>setSel(p)}/>}
             {tab==='chats'&&<ChatsTab chats={chats}/>}
             {tab==='profile'&&<ProfileTab user={user} onLogout={handleLogout}/>}
+            </div>
             <div className="flex gap-1 border-t border-charcoal bg-deep-night px-2 py-2">
                 {[['search','🔍','Search'],['explore','🧭','Explore'],['snap','📸','Snap'],['chats','💬','Chats'],['profile','👤','Profile']].map(([k,ic,nm])=>(
                     <button key={k} onClick={()=>setTab(k)} className={'flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-all '+(tab===k?'bg-flame/20':'hover:bg-dn-light')}>
