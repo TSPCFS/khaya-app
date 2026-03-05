@@ -7,8 +7,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "seed": "node db/seed.js",
-    "reset": "rm -f db/khaya.db && node db/seed.js",
-    "postinstall": "node db/seed-if-needed.js"
+    "reset": "rm -f db/khaya.db && node db/seed.js"
   },
   "dependencies": {
     "express": "^4.21.0",
